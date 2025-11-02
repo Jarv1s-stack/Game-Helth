@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <title>Push-Up Tracker</title>
+
+  <!-- Montserrat -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- ✅ Актуальные версии MediaPipe -->
+  <script defer src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.min.js"></script>
+
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body {
+      background: #000;
+      color: #6CB817;
+      font-family: 'Montserrat', sans-serif;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+    h1 {
+      color: #6CB817;
+    }
+    video {
+      border: 4px solid #2F5C6D;
+      border-radius: 12px;
+      width: 80%;
+      max-width: 800px;
+      transform: scaleX(-1);
+    }
+    button {
+      background: #6CB817;
+      color: #000;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      margin: 10px;
+    }
+    button:hover {
+      background: #2F5C6D;
+      color: #fff;
+    }
+    .info {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Push-Up Counter</h1>
+  <video id="video" autoplay playsinline muted></video>
+
+  <div class="info">
+    <h2>Отжиманий: <span id="count">0</span></h2>
+    <h3>Время в играх: <span id="minutes">0</span> минут</h3>
+    <button id="reset">Сбросить счётчик</button>
+  </div>
+
+  <script>
+    // Локальные данные
+    let pushups = parseInt(localStorage.getItem("pushups")) || 0;
+    let minutes = parseInt(localStorage.getItem("minutes")) || 0;
+    document.getElementById("count").textContent = pushups;
+    document.getElementById("minutes").textContent = minutes;
+
+    // Функция для сохранения
+    function saveData() {
+      localStorage.setItem("pushups", pushups);
+      localStorage.setItem("minutes", minutes);
+    }
+
+    // Угол в локте
+    function getAngle(a, b, c) {
+      const ab = { x: a.x - b.x, y: a.y - b.y };
+      const cb = { x: c.x - b.x, y: c.y - b.y };
+      const dot = ab.x * cb.x + ab.y * cb.y;
+      const magAB = Math.hypot(ab.x, ab.y);
+      const magCB = Math.hypot(cb.x, cb.y);
+      let cos = dot / (magAB * magCB);
+      cos = Math.min(1, Math.max(-1, cos));
+      return (Math.acos(cos) * 180) / Math.PI;
+    }
+
+    // Логика счётчика
+    let goingDown = false;
+
+    // ✅ Исправленная инициализация Pose
+    window.addEventListener("load", () => {
+      if (typeof Pose === "undefined") {
+        alert("Ошибка: библиотека MediaPipe Pose не загрузилась. Проверь подключение к интернету.");
+        return;
+      }
+
+      const video = document.getElementById("video");
+      const pose = new Pose({
+        locateFile: file =>
+          `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`,
+      });
+
+      pose.setOptions({
+        modelComplexity: 1,
+        smoothLandmarks: true,
+        enableSegmentation: false,
+        minDetectionConfidence: 0.5,
+        minTrackingConfidence: 0.5,
+      });
+
+      pose.onResults(results => {
+        if (!results.poseLandmarks) return;
+        const ls = results.poseLandmarks[11];
+        const le = results.poseLandmarks[13];
+        const lw = results.poseLandmarks[15];
+
+        const angle = getAngle(ls, le, lw);
+
+        if (angle < 70 && !goingDown) {
+          goingDown = true;
+        } else if (angle > 150 && goingDown) {
+          goingDown = false;
+          pushups++;
+          minutes++;
+          saveData();
+          document.getElementById("count").textContent = pushups;
+          document.getElementById("minutes").textContent = minutes;
+
+          if (pushups % 100 === 0) {
+            alert(`🔥 Ты сделал ${pushups} отжиманий! У тебя ${minutes} минут игрового времени.`);
+          }
+        }
+      });
+
+      // Подключаем камеру
+      const camera = new Camera(video, {
+        onFrame: async () => {
+          await pose.send({ image: video });
+        },
+        width: 640,
+        height: 480,
+      });
+
+      camera.start();
+    });
+
+    document.getElementById("reset").addEventListener("click", () => {
+      pushups = 0;
+      minutes = 0;
+      saveData();
+      document.getElementById("count").textContent = 0;
+      document.getElementById("minutes").textContent = 0;
+    });
+  </script>
+</body>
+</html>
