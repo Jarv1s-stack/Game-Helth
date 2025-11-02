@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mental Health Check - Health & Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #ffffff;
+            color: #2F5C6D;
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: #ffffff;
+            padding: 1.2rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 20px rgba(47, 92, 109, 0.1);
+            border-bottom: 3px solid #6CB817;
+        }
+
+        .logo {
+            color: #2F5C6D;
+            font-size: 1.6rem;
+            font-weight: 800;
+        }
+
+        .logo span {
+            color: #6CB817;
+        }
+
+        nav {
+            display: flex;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: #2F5C6D;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+        }
+
+        nav a:hover {
+            color: #6CB817;
+            background: rgba(108, 184, 23, 0.1);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .main-title {
+            color: #2F5C6D;
+            text-align: center;
+            margin-bottom: 1rem;
+            font-size: 2.5rem;
+        }
+
+        .main-title span {
+            color: #6CB817;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #2F5C6D;
+            margin-bottom: 3rem;
+            font-size: 1.2rem;
+        }
+
+        .warning-banner {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            color: #856404;
+        }
+
+        .assessment-container {
+            background: #f8f9fa;
+            border: none;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(47, 92, 109, 0.1);
+        }
+
+        .chat-container {
+            height: 400px;
+            overflow-y: auto;
+            border: 2px solid #2F5C6D;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background: white;
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 10px;
+            max-width: 80%;
+        }
+
+        .ai-message {
+            background: #e8f5e8;
+            border-left: 4px solid #6CB817;
+            margin-right: auto;
+        }
+
+        .user-message {
+            background: #e3f2fd;
+            border-left: 4px solid #2F5C6D;
+            margin-left: auto;
+        }
+
+        .message-sender {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #2F5C6D;
+        }
+
+        .input-area {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        #user-input {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid #2F5C6D;
+            border-radius: 10px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        #send-btn {
+            background: #6CB817;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        #send-btn:hover {
+            background: #5aa314;
+            transform: translateY(-2px);
+        }
+
+        #send-btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .results-section {
+            background: #f8f9fa;
+            border: 2px solid #6CB817;
+            border-radius: 15px;
+            padding: 2rem;
+            display: none;
+        }
+
+        .results-section h3 {
+            color: #2F5C6D;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .result-category {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            border-left: 4px solid #2F5C6D;
+        }
+
+        .result-category h4 {
+            color: #6CB817;
+            margin-bottom: 0.5rem;
+        }
+
+        .diagnosis {
+            background: linear-gradient(135deg, #6CB817, #2F5C6D);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .loading {
+            text-align: center;
+            color: #2F5C6D;
+            font-style: italic;
+        }
+
+        .typing-indicator {
+            display: inline-block;
+            margin-left: 0.5rem;
+        }
+
+        .typing-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #6CB817;
+            margin: 0 2px;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            nav {
+                gap: 0.5rem;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            nav a {
+                font-size: 0.8rem;
+                padding: 0.4rem 0.8rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .main-title {
+                font-size: 2rem;
+            }
+
+            .input-area {
+                flex-direction: column;
+            }
+
+            .message {
+                max-width: 95%;
+            }
+
+            .chat-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo" onclick="window.location.href=(`/index.html`)" >Health & <span>Game</span></div>
+        <nav>
+            <a href="/HTML/Push-Up.html">PUSH-UP</a>
+            <a href="/HTML/TEST.html">TEST</a>
+            <a href="/HTML/Support.html">SUPPORT</a>
+            <a href="#">PROFILE</a>
+            <a href="/HTML/DialogwithAI.html">DIALOGUE WITH AI</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h1 class="main-title">Mental Health <span>Check</span></h1>
+        <p class="subtitle">After gaming or social media use, let's check how you're feeling</p>
+
+        <div class="warning-banner">
+            ⚠️ <strong>Important:</strong> This AI assistant is for support and reflection only. 
+            It is not a substitute for professional mental health care. 
+            If you're in crisis, please contact a mental health professional.
+        </div>
+
+        <div class="assessment-container">
+            <div class="chat-container" id="chat-container">
+                <div class="message ai-message">
+                    <div class="message-sender">Mental Health Assistant</div>
+                    <div>Hello! I'm here to help you reflect on your gaming or social media experience. I'll ask you some questions to understand how you're feeling, and then provide insights and suggestions. What would you like to share about your recent experience?</div>
+                </div>
+            </div>
+
+            <div class="input-area">
+                <textarea id="user-input" placeholder="Describe your experience, feelings, or anything you'd like to share..."></textarea>
+                <button id="send-btn">Send</button>
+            </div>
+
+            <div class="loading" id="loading" style="display: none;">
+                Thinking about your response<span class="typing-indicator">
+                    <span class="typing-dot"></span>
+                    <span class="typing-dot"></span>
+                    <span class="typing-dot"></span>
+                </span>
+            </div>
+        </div>
+
+        <div class="results-section" id="results-section">
+            <h3>Your Mental Health Assessment</h3>
+            
+            <div class="result-category">
+                <h4>📊 Current State Analysis</h4>
+                <div id="state-analysis">Loading analysis...</div>
+            </div>
+            
+            <div class="result-category">
+                <h4>💡 Recommendations</h4>
+                <div id="recommendations">Loading recommendations...</div>
+            </div>
+            
+            <div class="result-category">
+                <h4>🛠️ Coping Strategies</h4>
+                <div id="coping-strategies">Loading strategies...</div>
+            </div>
+            
+            <div class="diagnosis">
+                <h4>🎯 Assessment Summary</h4>
+                <div id="diagnosis-summary">Loading diagnosis...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Conversation state
+        let conversationHistory = JSON.parse(localStorage.getItem('mentalHealthConversation')) || [];
+        let assessmentCompleted = localStorage.getItem('assessmentCompleted') === 'true';
+        let conversationStage = parseInt(localStorage.getItem('conversationStage')) || 0;
+        let userProfile = JSON.parse(localStorage.getItem('userMentalHealthProfile')) || {
+            gamingHabits: '',
+            socialMediaUse: '',
+            emotionalState: '',
+            copingMechanisms: '',
+            sleepPatterns: '',
+            stressLevel: 0
+        };
+
+        // DOM elements
+        const chatContainer = document.getElementById('chat-container');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+        const loading = document.getElementById('loading');
+        const resultsSection = document.getElementById('results-section');
+
+        // Intelligent response system
+        const responseSystem = {
+            // Initial greeting and questions
+            stages: [
+                {
+                    question: "Hello! I'm here to help you reflect on your gaming or social media experience. What would you like to share about your recent experience?",
+                    keywords: [],
+                    type: "opening"
+                },
+                {
+                    question: "How has this experience affected your mood and energy levels today?",
+                    keywords: ['game', 'play', 'social media', 'instagram', 'facebook', 'tiktok', 'online'],
+                    type: "impact"
+                },
+                {
+                    question: "What thoughts or emotions came up for you during this time?",
+                    keywords: ['feel', 'emotion', 'thought', 'mind', 'thinking'],
+                    type: "emotions"
+                },
+                {
+                    question: "How long were you engaged in this activity, and did you notice any changes in how you felt over time?",
+                    keywords: ['time', 'hour', 'minute', 'long', 'while', 'duration'],
+                    type: "duration"
+                },
+                {
+                    question: "What do you usually do to unwind or cope after such experiences?",
+                    keywords: ['cope', 'deal', 'handle', 'manage', 'unwind', 'relax'],
+                    type: "coping"
+                },
+                {
+                    question: "Thank you for sharing. I now have enough information to provide you with a personalized assessment.",
+                    keywords: ['assessment', 'analyze', 'summary'],
+                    type: "conclusion"
+                }
+            ],
+
+            // Response templates based on detected emotions
+            emotionalResponses: {
+                frustration: [
+                    "I understand that can be really frustrating. Gaming and social media can sometimes bring up these feelings.",
+                    "That sounds challenging. Frustration is a common emotion when things don't go as expected online.",
+                    "I hear the frustration in your message. Let's explore what specifically triggered these feelings."
+                ],
+                anxiety: [
+                    "I sense some anxiety in what you're describing. That's completely understandable in these situations.",
+                    "Anxiety can be really tough to manage, especially after intense online experiences.",
+                    "Thank you for sharing that. Anxiety is a common response to digital overstimulation."
+                ],
+                sadness: [
+                    "I'm sorry you're feeling this way. It takes courage to share these feelings.",
+                    "That sounds really difficult. Sadness after online activities is more common than people think.",
+                    "I hear the sadness in your message. Let's work through this together."
+                ],
+                exhaustion: [
+                    "It sounds like this left you feeling drained. Mental exhaustion is real after extended screen time.",
+                    "I understand that tired feeling. Digital activities can be surprisingly taxing.",
+                    "That sounds exhausting. Our minds need recovery time after intense focus."
+                ],
+                excitement: [
+                    "It's great that you found this exciting! Positive experiences are important too.",
+                    "That sounds really engaging! It's wonderful when digital activities bring joy.",
+                    "I'm glad this was a positive experience for you. Balance is key."
+                ],
+                neutral: [
+                    "Thank you for sharing that with me.",
+                    "I appreciate you taking the time to reflect on this.",
+                    "That's helpful context for understanding your experience."
+                ]
+            },
+
+            // Follow-up questions based on context
+            followUps: {
+                gaming: [
+                    "What aspect of the game affected you the most?",
+                    "Did you play competitively or just for fun?",
+                    "How do you usually feel after gaming sessions?",
+                    "What makes you return to gaming when you're feeling this way?"
+                ],
+                social: [
+                    "What type of content were you mostly engaging with?",
+                    "Do you find yourself comparing your life to others online?",
+                    "How does social media typically make you feel about yourself?",
+                    "What do you hope to get from your social media use?"
+                ],
+                general: [
+                    "How is this affecting your daily routine?",
+                    "What support systems do you have when feeling this way?",
+                    "How long have you been noticing these patterns?",
+                    "What would you like to change about this situation?"
+                ]
+            }
+        };
+
+        // Initialize conversation from localStorage
+        function initializeConversation() {
+            if (conversationHistory.length > 0) {
+                conversationHistory.forEach(msg => {
+                    addMessageToChat(msg.sender, msg.text);
+                });
+                // Set the conversation stage based on history
+                conversationStage = Math.min(conversationHistory.length / 2, responseSystem.stages.length - 1);
+            }
+
+            if (assessmentCompleted) {
+                showResults();
+                // Load the latest assessment if available
+                const latestAssessment = JSON.parse(localStorage.getItem('latestAssessment'));
+                if (latestAssessment) {
+                    document.getElementById('state-analysis').textContent = latestAssessment.analysis.state_analysis;
+                    document.getElementById('recommendations').textContent = latestAssessment.analysis.recommendations;
+                    document.getElementById('coping-strategies').textContent = latestAssessment.analysis.coping_strategies;
+                    document.getElementById('diagnosis-summary').textContent = latestAssessment.analysis.diagnosis_summary;
+                }
+            }
+        }
+
+        // Add message to chat
+        function addMessageToChat(sender, text) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender === 'AI' ? 'ai-message' : 'user-message'}`;
+            
+            messageDiv.innerHTML = `
+                <div class="message-sender">${sender === 'AI' ? 'Mental Health Assistant' : 'You'}</div>
+                <div>${text}</div>
+            `;
+            
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // Save conversation to localStorage
+        function saveConversation() {
+            localStorage.setItem('mentalHealthConversation', JSON.stringify(conversationHistory));
+            localStorage.setItem('conversationStage', conversationStage.toString());
+        }
+
+        // Analyze user message and generate intelligent response
+        function getAIResponse(userMessage) {
+            const lowerMessage = userMessage.toLowerCase();
+            
+            // Update user profile based on message content
+            updateUserProfile(userMessage);
+            
+            // Detect primary emotion in the message
+            const emotion = detectEmotion(lowerMessage);
+            
+            // Detect context (gaming, social media, general)
+            const context = detectContext(lowerMessage);
+            
+            // Get appropriate emotional response
+            const emotionalResponse = getEmotionalResponse(emotion);
+            
+            // Check if we should progress to next stage
+            const shouldProgress = checkConversationProgress(lowerMessage);
+            
+            if (shouldProgress && conversationStage < responseSystem.stages.length - 1) {
+                conversationStage++;
+                localStorage.setItem('conversationStage', conversationStage.toString());
+            }
+            
+            // If we're at the conclusion stage, trigger assessment
+            if (conversationStage >= responseSystem.stages.length - 1) {
+                return "Thank you for sharing all of this with me. I now have enough information to provide you with a personalized assessment. Let me analyze what we've discussed...";
+            }
+            
+            // Build the response
+            let response = emotionalResponse + " ";
+            
+            // Add the next question based on current stage
+            response += responseSystem.stages[conversationStage].question;
+            
+            // Occasionally add a follow-up question for richness
+            if (Math.random() > 0.7) {
+                const followUps = responseSystem.followUps[context];
+                if (followUps && followUps.length > 0) {
+                    response += " " + followUps[Math.floor(Math.random() * followUps.length)];
+                }
+            }
+            
+            return response;
+        }
+
+        // Detect emotion from user message
+        function detectEmotion(message) {
+            if (message.includes('angry') || message.includes('frustrat') || message.includes('annoy') || message.includes('mad')) {
+                return 'frustration';
+            } else if (message.includes('anxious') || message.includes('nervous') || message.includes('worri') || message.includes('stress')) {
+                return 'anxiety';
+            } else if (message.includes('sad') || message.includes('depress') || message.includes('down') || message.includes('hopeless')) {
+                return 'sadness';
+            } else if (message.includes('tired') || message.includes('exhaust') || message.includes('drain') || message.includes('fatigue')) {
+                return 'exhaustion';
+            } else if (message.includes('excit') || message.includes('happy') || message.includes('joy') || message.includes('good')) {
+                return 'excitement';
+            } else {
+                return 'neutral';
+            }
+        }
+
+        // Detect context from user message
+        function detectContext(message) {
+            if (message.includes('game') || message.includes('play') || message.includes('gaming') || message.includes('player')) {
+                return 'gaming';
+            } else if (message.includes('social media') || message.includes('instagram') || message.includes('facebook') || message.includes('tiktok') || message.includes('twitter')) {
+                return 'social';
+            } else {
+                return 'general';
+            }
+        }
+
+        // Get emotional response based on detected emotion
+        function getEmotionalResponse(emotion) {
+            const responses = responseSystem.emotionalResponses[emotion];
+            return responses[Math.floor(Math.random() * responses.length)];
+        }
+
+        // Check if conversation should progress to next stage
+        function checkConversationProgress(message) {
+            // Progress if user's message is substantial and relevant
+            const wordCount = message.split(' ').length;
+            const hasRelevantKeywords = responseSystem.stages[conversationStage].keywords.some(keyword => 
+                message.includes(keyword)
+            );
+            
+            return wordCount > 5 || hasRelevantKeywords || Math.random() > 0.8;
+        }
+
+        // Update user profile based on conversation
+        function updateUserProfile(message) {
+            const lowerMessage = message.toLowerCase();
+            
+            if (lowerMessage.includes('game') || lowerMessage.includes('play')) {
+                userProfile.gamingHabits = extractKeyInfo(message);
+            }
+            
+            if (lowerMessage.includes('social media') || lowerMessage.includes('instagram') || lowerMessage.includes('facebook')) {
+                userProfile.socialMediaUse = extractKeyInfo(message);
+            }
+            
+            if (lowerMessage.includes('feel') || lowerMessage.includes('emotion')) {
+                userProfile.emotionalState = extractKeyInfo(message);
+            }
+            
+            if (lowerMessage.includes('cope') || lowerMessage.includes('deal') || lowerMessage.includes('handle')) {
+                userProfile.copingMechanisms = extractKeyInfo(message);
+            }
+            
+            if (lowerMessage.includes('sleep') || lowerMessage.includes('tired') || lowerMessage.includes('energy')) {
+                userProfile.sleepPatterns = extractKeyInfo(message);
+            }
+            
+            // Estimate stress level based on keywords
+            userProfile.stressLevel = estimateStressLevel(message);
+            
+            localStorage.setItem('userMentalHealthProfile', JSON.stringify(userProfile));
+        }
+
+        // Extract key information from message
+        function extractKeyInfo(message) {
+            // Simple extraction - in a real system, this would be more sophisticated
+            return message.substring(0, 100) + "...";
+        }
+
+        // Estimate stress level from message
+        function estimateStressLevel(message) {
+            let stressScore = 5; // Default neutral
+            
+            const stressWords = ['stress', 'overwhelm', 'anxious', 'panic', 'pressure', 'burnout'];
+            const calmWords = ['relax', 'calm', 'peace', 'balance', 'good', 'happy'];
+            
+            stressWords.forEach(word => {
+                if (message.includes(word)) stressScore += 2;
+            });
+            
+            calmWords.forEach(word => {
+                if (message.includes(word)) stressScore -= 1;
+            });
+            
+            return Math.max(1, Math.min(10, stressScore));
+        }
+
+        // Generate comprehensive assessment
+        function generateAssessment() {
+            const analysis = analyzeConversation();
+            
+            document.getElementById('state-analysis').textContent = analysis.state_analysis;
+            document.getElementById('recommendations').textContent = analysis.recommendations;
+            document.getElementById('coping-strategies').textContent = analysis.coping_strategies;
+            document.getElementById('diagnosis-summary').textContent = analysis.diagnosis_summary;
+            
+            // Save assessment to localStorage
+            const assessmentRecord = {
+                date: new Date().toISOString(),
+                analysis: analysis,
+                conversation: conversationHistory,
+                userProfile: userProfile
+            };
+            localStorage.setItem('latestAssessment', JSON.stringify(assessmentRecord));
+            localStorage.setItem('assessmentCompleted', 'true');
+            
+            showResults();
+        }
+
+        // Analyze the entire conversation
+        function analyzeConversation() {
+            const userText = conversationHistory
+                .filter(msg => msg.sender === 'user')
+                .map(msg => msg.text)
+                .join(' ')
+                .toLowerCase();
+            
+            const stressLevel = userProfile.stressLevel;
+            const primaryEmotion = detectEmotion(userText);
+            const context = detectContext(userText);
+            
+            // Generate personalized analysis based on collected data
+            return {
+                state_analysis: generateStateAnalysis(primaryEmotion, stressLevel, context),
+                recommendations: generateRecommendations(primaryEmotion, stressLevel, context),
+                coping_strategies: generateCopingStrategies(primaryEmotion, stressLevel),
+                diagnosis_summary: generateDiagnosis(primaryEmotion, stressLevel, context)
+            };
+        }
+
+        // Generate state analysis
+        function generateStateAnalysis(emotion, stressLevel, context) {
+            const baseAnalysis = {
+                frustration: `Based on our conversation, you're experiencing frustration related to your ${context} activities. This is common when expectations don't match reality in digital environments.`,
+                anxiety: `You seem to be dealing with anxiety connected to your ${context} usage. Digital spaces can sometimes trigger anxious thoughts and feelings.`,
+                sadness: `I'm noticing signs of sadness in relation to your ${context} experiences. Emotional responses to online content are completely valid.`,
+                exhaustion: `You appear to be experiencing mental exhaustion from your ${context} engagement. Our minds need recovery time after screen exposure.`,
+                excitement: `It's great that you're finding excitement in your ${context} activities! Positive digital experiences can be beneficial in moderation.`,
+                neutral: `Based on our discussion, you seem to have a balanced perspective on your ${context} usage.`
+            };
+            
+            let analysis = baseAnalysis[emotion] || baseAnalysis.neutral;
+            
+            // Add stress level context
+            if (stressLevel >= 7) {
+                analysis += ` Your stress levels appear elevated, which might be amplifying these feelings.`;
+            } else if (stressLevel <= 4) {
+                analysis += ` Your stress management seems fairly stable.`;
+            }
+            
+            return analysis;
+        }
+
+        // Generate personalized recommendations
+        function generateRecommendations(emotion, stressLevel, context) {
+            const recommendations = [];
+            
+            // Base recommendations for all situations
+            recommendations.push("• Take regular breaks from screens every 60-90 minutes");
+            recommendations.push("• Practice the 20-20-20 rule: every 20 minutes, look at something 20 feet away for 20 seconds");
+            recommendations.push("• Set clear time limits for your digital activities");
+            
+            // Emotion-specific recommendations
+            if (emotion === 'frustration') {
+                recommendations.push("• Practice deep breathing when you feel frustration building");
+                recommendations.push("• Consider taking a short walk to reset your mindset");
+            } else if (emotion === 'anxiety') {
+                recommendations.push("• Try grounding techniques like the 5-4-3-2-1 method");
+                recommendations.push("• Limit exposure to triggering content or discussions");
+            } else if (emotion === 'sadness') {
+                recommendations.push("• Engage in offline activities that bring you joy");
+                recommendations.push("• Connect with supportive friends or family members");
+            } else if (emotion === 'exhaustion') {
+                recommendations.push("• Ensure you're getting adequate sleep and hydration");
+                recommendations.push("• Consider a digital detox for a few hours or a day");
+            }
+            
+            // Stress-level specific recommendations
+            if (stressLevel >= 7) {
+                recommendations.push("• Practice daily mindfulness or meditation");
+                recommendations.push("• Consider talking to a mental health professional");
+            }
+            
+            return recommendations.join('\n');
+        }
+
+        // Generate coping strategies
+        function generateCopingStrategies(emotion, stressLevel) {
+            const strategies = [];
+            
+            strategies.push("• Digital mindfulness: Be intentional about why you're going online");
+            strategies.push("• Create a wind-down routine after digital activities");
+            strategies.push("• Keep a journal to process your digital experiences");
+            
+            if (emotion === 'frustration' || emotion === 'anxiety') {
+                strategies.push("• Progressive muscle relaxation technique");
+                strategies.push("• Box breathing: inhale 4s, hold 4s, exhale 4s, hold 4s");
+            }
+            
+            if (stressLevel >= 6) {
+                strategies.push("• Schedule worry time: designate 15 minutes daily for concerns");
+                strategies.push("• Physical activity: even 10 minutes can reduce stress");
+            }
+            
+            return strategies.join('\n');
+        }
+
+        // Generate diagnosis summary
+        function generateDiagnosis(emotion, stressLevel, context) {
+            const severity = stressLevel >= 7 ? "Moderate" : stressLevel >= 5 ? "Mild" : "Minimal";
+            
+            return `${severity} Digital-Induced ${emotion.charAt(0).toUpperCase() + emotion.slice(1)} - A common temporary state that typically improves with balanced digital habits and self-care practices.`;
+        }
+
+        // Show results section
+        function showResults() {
+            resultsSection.style.display = 'block';
+            assessmentCompleted = true;
+        }
+
+        // Handle send button click
+        sendBtn.addEventListener('click', async () => {
+            const message = userInput.value.trim();
+            if (!message) return;
+            
+            // Add user message to chat
+            addMessageToChat('user', message);
+            conversationHistory.push({ sender: 'user', text: message });
+            
+            // Clear input
+            userInput.value = '';
+            
+            // Show loading
+            loading.style.display = 'block';
+            sendBtn.disabled = true;
+            
+            // Simulate thinking time
+            setTimeout(() => {
+                // Get AI response
+                const aiResponse = getAIResponse(message);
+                
+                // Add AI response to chat
+                addMessageToChat('AI', aiResponse);
+                conversationHistory.push({ sender: 'AI', text: aiResponse });
+                
+                // Save conversation
+                saveConversation();
+                
+                // Check if should generate final assessment
+                if (aiResponse.includes('assessment') || conversationStage >= responseSystem.stages.length - 1) {
+                    loading.style.display = 'block';
+                    generateAssessment();
+                }
+                
+                // Hide loading
+                loading.style.display = 'none';
+                sendBtn.disabled = false;
+            }, 1500);
+        });
+
+        // Handle Enter key in textarea
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendBtn.click();
+            }
+        });
+
+        // Initialize
+        initializeConversation();
+    </script>
+</body>
+</html>

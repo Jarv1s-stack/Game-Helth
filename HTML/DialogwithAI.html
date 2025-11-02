@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dialogue with AI - Health & Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #ffffff;
+            color: #2F5C6D;
+            line-height: 1.6;
+        }
+
+        /* Header */
+        header {
+            background-color: #ffffff;
+            padding: 1.2rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 20px rgba(47, 92, 109, 0.1);
+            border-bottom: 3px solid #6CB817;
+        }
+
+        .logo {
+            color: #2F5C6D;
+            font-size: 1.6rem;
+            font-weight: 800;
+        }
+
+        .logo span {
+            color: #6CB817;
+        }
+
+        nav {
+            display: flex;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: #2F5C6D;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+        }
+
+        nav a:hover {
+            color: #6CB817;
+            background: rgba(108, 184, 23, 0.1);
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .main-title {
+            color: #2F5C6D;
+            text-align: center;
+            margin-bottom: 1rem;
+            font-size: 2.5rem;
+        }
+
+        .main-title span {
+            color: #6CB817;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #2F5C6D;
+            margin-bottom: 3rem;
+            font-size: 1.2rem;
+        }
+
+        /* Chat Container */
+        .chat-container {
+            background: #f8f9fa;
+            border: 2px solid #6CB817;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(47, 92, 109, 0.1);
+            height: 500px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .messages-area {
+            flex: 1;
+            overflow-y: auto;
+            border: 2px solid #2F5C6D;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background: white;
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 10px;
+            max-width: 80%;
+        }
+
+        .ai-message {
+            background: #e8f5e8;
+            border-left: 4px solid #6CB817;
+            margin-right: auto;
+        }
+
+        .user-message {
+            background: #e3f2fd;
+            border-left: 4px solid #2F5C6D;
+            margin-left: auto;
+        }
+
+        .message-sender {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #2F5C6D;
+            font-size: 0.9rem;
+        }
+
+        .message-content {
+            line-height: 1.5;
+        }
+
+        /* Input Area */
+        .input-area {
+            display: flex;
+            gap: 1rem;
+        }
+
+        #user-input {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid #2F5C6D;
+            border-radius: 10px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            resize: none;
+            min-height: 60px;
+        }
+
+        #send-btn {
+            background: #6CB817;
+            color: white;
+            border: none;
+            padding: 0 2rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #send-btn:hover {
+            background: #5aa314;
+            transform: translateY(-2px);
+        }
+
+        #send-btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+        }
+
+        #clear-btn {
+            background: #2F5C6D;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        #clear-btn:hover {
+            background: #264a5a;
+        }
+
+        .character-count {
+            color: #2F5C6D;
+            font-size: 0.9rem;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            color: #2F5C6D;
+            font-style: italic;
+            display: none;
+        }
+
+        .typing-indicator {
+            display: inline-block;
+            margin-left: 0.5rem;
+        }
+
+        .typing-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #6CB817;
+            margin: 0 2px;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+
+        /* Suggestions */
+        .suggestions {
+            margin-top: 1rem;
+        }
+
+        .suggestions-title {
+            color: #2F5C6D;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .suggestion-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .suggestion-chip {
+            background: white;
+            border: 1px solid #6CB817;
+            color: #2F5C6D;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .suggestion-chip:hover {
+            background: #6CB817;
+            color: white;
+        }
+
+        /* Mobile Adaptation */
+        @media (max-width: 768px) {
+            header {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            nav {
+                gap: 0.5rem;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            nav a {
+                font-size: 0.8rem;
+                padding: 0.4rem 0.8rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .main-title {
+                font-size: 2rem;
+            }
+
+            .chat-container {
+                height: 400px;
+                padding: 1rem;
+            }
+
+            .input-area {
+                flex-direction: column;
+            }
+
+            #send-btn {
+                padding: 1rem;
+            }
+
+            .message {
+                max-width: 90%;
+            }
+
+            .suggestion-chips {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo" onclick="window.location.href=(`/index.html`)">Health & <span>Game</span></div>
+        <nav>
+            <a href="/HTML/Push-Up.html">PUSH-UP</a>
+            <a href="/HTML/TEST.html">TEST</a>
+            <a href="/HTML/Support.html">SUPPORT</a>
+            <a href="#">PROFILE</a>
+            <a href="/HTML/DIALOGUE-WITH-AI.html">DIALOGUE WITH AI</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h1 class="main-title">Dialogue with <span>AI</span></h1>
+        <p class="subtitle">Chat with our AI assistant about anything - games, health, life, or just casual conversation</p>
+
+        <div class="chat-container">
+            <div class="messages-area" id="messages-area">
+                <div class="message ai-message">
+                    <div class="message-sender">AI Assistant</div>
+                    <div class="message-content">Hello! I'm your AI assistant. I'm here to chat with you about anything you'd like - games, health, productivity, or just casual conversation. What's on your mind today?</div>
+                </div>
+            </div>
+
+            <div class="input-area">
+                <textarea id="user-input" placeholder="Type your message here..."></textarea>
+                <button id="send-btn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z" fill="currentColor"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="controls">
+                <button id="clear-btn">Clear Conversation</button>
+                <div class="character-count">
+                    <span id="char-count">0</span>/500 characters
+                </div>
+            </div>
+        </div>
+
+        <div class="loading" id="loading">
+            AI is thinking<span class="typing-indicator">
+                <span class="typing-dot"></span>
+                <span class="typing-dot"></span>
+                <span class="typing-dot"></span>
+            </span>
+        </div>
+
+        <div class="suggestions">
+            <div class="suggestions-title">Quick suggestions:</div>
+            <div class="suggestion-chips">
+                <div class="suggestion-chip" data-suggestion="Tell me about healthy gaming habits">Healthy gaming habits</div>
+                <div class="suggestion-chip" data-suggestion="How to balance screen time and exercise">Screen time balance</div>
+                <div class="suggestion-chip" data-suggestion="What are some good mental health practices for gamers">Mental health for gamers</div>
+                <div class="suggestion-chip" data-suggestion="Suggest some productivity tips">Productivity tips</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM elements
+        const messagesArea = document.getElementById('messages-area');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+        const clearBtn = document.getElementById('clear-btn');
+        const loading = document.getElementById('loading');
+        const charCount = document.getElementById('char-count');
+
+        // Conversation memory (only for current session)
+        let conversationContext = [];
+
+        // Character counter
+        userInput.addEventListener('input', () => {
+            const count = userInput.value.length;
+            charCount.textContent = count;
+            
+            // Change color if approaching limit
+            if (count > 450) {
+                charCount.style.color = '#e74c3c';
+            } else if (count > 400) {
+                charCount.style.color = '#f39c12';
+            } else {
+                charCount.style.color = '#2F5C6D';
+            }
+        });
+
+        // Add message to chat
+        function addMessage(sender, content) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender === 'AI' ? 'ai-message' : 'user-message'}`;
+            
+            messageDiv.innerHTML = `
+                <div class="message-sender">${sender === 'AI' ? 'AI Assistant' : 'You'}</div>
+                <div class="message-content">${content}</div>
+            `;
+            
+            messagesArea.appendChild(messageDiv);
+            messagesArea.scrollTop = messagesArea.scrollHeight;
+            
+            // Add to conversation context (keep last 10 messages for context)
+            conversationContext.push({ sender, content });
+            if (conversationContext.length > 10) {
+                conversationContext = conversationContext.slice(-10);
+            }
+        }
+
+        // Generate AI response
+        function generateAIResponse(userMessage) {
+            const lowerMessage = userMessage.toLowerCase();
+            
+            // Contextual responses based on conversation
+            const lastAIMessage = conversationContext
+                .filter(msg => msg.sender === 'AI')
+                .slice(-1)[0]?.content || '';
+            
+            // Response templates for different contexts
+            const responseTemplates = {
+                greeting: [
+                    "Hello! How can I assist you today?",
+                    "Hi there! What would you like to chat about?",
+                    "Greetings! I'm here to help with anything you'd like to discuss."
+                ],
+                gaming: [
+                    "When it comes to gaming, balance is key. Regular breaks every hour can help prevent eye strain and fatigue.",
+                    "Gaming can be a great way to relax, but it's important to also engage in physical activity and social connections.",
+                    "Many gamers find success with the 20-20-20 rule: every 20 minutes, look at something 20 feet away for 20 seconds."
+                ],
+                health: [
+                    "Maintaining good health while gaming involves proper posture, regular movement, and staying hydrated.",
+                    "Physical health and mental well-being go hand in hand. Even short exercise breaks can make a big difference.",
+                    "Remember that both your body and mind need care. Balanced nutrition, exercise, and sleep are all important."
+                ],
+                productivity: [
+                    "Productivity often comes from focused work sessions followed by proper breaks. The Pomodoro technique works well for many people.",
+                    "Setting clear goals and eliminating distractions can significantly boost your productivity.",
+                    "Remember that productivity isn't about working all the time - it's about working effectively during focused periods."
+                ],
+                motivation: [
+                    "Motivation often follows action rather than precedes it. Sometimes starting small is the key.",
+                    "Break big goals into smaller, manageable tasks. Each small victory builds momentum.",
+                    "Remember why you started. Reconnecting with your purpose can reignite motivation."
+                ],
+                general: [
+                    "That's interesting. Tell me more about that.",
+                    "I understand. How does that make you feel?",
+                    "Thanks for sharing. What are your thoughts on this?",
+                    "That's a great point. Could you elaborate?",
+                    "I see what you mean. What would you like to explore about this topic?"
+                ]
+            };
+
+            // Determine response category
+            let category = 'general';
+            
+            if (lowerMessage.includes('hello') || lowerMessage.includes('hi ') || lowerMessage.includes('hey')) {
+                category = 'greeting';
+            } else if (lowerMessage.includes('game') || lowerMessage.includes('play') || lowerMessage.includes('gaming')) {
+                category = 'gaming';
+            } else if (lowerMessage.includes('health') || lowerMessage.includes('exercise') || lowerMessage.includes('fit') || lowerMessage.includes('diet')) {
+                category = 'health';
+            } else if (lowerMessage.includes('productiv') || lowerMessage.includes('work') || lowerMessage.includes('focus') || lowerMessage.includes('study')) {
+                category = 'productivity';
+            } else if (lowerMessage.includes('motivat') || lowerMessage.includes('inspire') || lowerMessage.includes('goal')) {
+                category = 'motivation';
+            }
+
+            // Special responses for common questions
+            if (lowerMessage.includes('how are you') || lowerMessage.includes("how're you")) {
+                return "I'm functioning well, thank you for asking! I'm here and ready to help you with whatever you need. How are you doing today?";
+            }
+            
+            if (lowerMessage.includes('thank')) {
+                return "You're welcome! I'm glad I could help. Is there anything else you'd like to know or discuss?";
+            }
+            
+            if (lowerMessage.includes('what can you do') || lowerMessage.includes('help me')) {
+                return "I can help you with various topics including gaming habits, health and wellness, productivity tips, motivation, and general conversation. What would you like to explore?";
+            }
+
+            // Get random response from appropriate category
+            const responses = responseTemplates[category];
+            return responses[Math.floor(Math.random() * responses.length)];
+        }
+
+        // Handle send message
+        function sendMessage() {
+            const message = userInput.value.trim();
+            if (!message) return;
+            
+            // Add user message
+            addMessage('user', message);
+            
+            // Clear input
+            userInput.value = '';
+            charCount.textContent = '0';
+            
+            // Show loading
+            loading.style.display = 'block';
+            sendBtn.disabled = true;
+            
+            // Simulate AI thinking (1-2 seconds)
+            setTimeout(() => {
+                // Generate and add AI response
+                const aiResponse = generateAIResponse(message);
+                addMessage('AI', aiResponse);
+                
+                // Hide loading
+                loading.style.display = 'none';
+                sendBtn.disabled = false;
+                
+                // Focus back on input
+                userInput.focus();
+            }, 1000 + Math.random() * 1000);
+        }
+
+        // Clear conversation
+        function clearConversation() {
+            messagesArea.innerHTML = `
+                <div class="message ai-message">
+                    <div class="message-sender">AI Assistant</div>
+                    <div class="message-content">Hello! I'm your AI assistant. I'm here to chat with you about anything you'd like - games, health, productivity, or just casual conversation. What's on your mind today?</div>
+                </div>
+            `;
+            conversationContext = [];
+        }
+
+        // Event listeners
+        sendBtn.addEventListener('click', sendMessage);
+        
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+        
+        clearBtn.addEventListener('click', clearConversation);
+        
+        // Suggestion chips
+        document.querySelectorAll('.suggestion-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                userInput.value = chip.getAttribute('data-suggestion');
+                charCount.textContent = userInput.value.length;
+                userInput.focus();
+            });
+        });
+
+        // Auto-focus on input
+        userInput.focus();
+    </script>
+</body>
+</html>
